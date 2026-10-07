@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 trait WOLHelper
 {
+    //Weckt das einzelne Gerät mit Broadcast- und MAC-Adresse aus der Konfiguration
     public function WakeOnLan(): void
     {
-        $addr = $this->ReadPropertyString('BroadcastAddress');
-        $mac = $this->ReadPropertyString('MACAddress');
+        $this->SendMagicPacket($this->ReadPropertyString('BroadcastAddress'), $this->ReadPropertyString('MACAddress'));
+    }
+
+    protected function IsValidMACAddress(string $mac): bool
+    {
+        return preg_match('/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/', $mac) === 1;
+    }
+
+    protected function SendMagicPacket(string $addr, string $mac): void
+    {
         if ($addr == '' || $mac == '') {
             $this->SendDebug(__FUNCTION__, 'Broadcast or Mac Address is missing', 0);
             return;
         }
-        if (!preg_match('/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/', $mac)) {
+        if (!$this->IsValidMACAddress($mac)) {
             $this->SendDebug(__FUNCTION__, 'MAC Address is invalid', 0);
             return;
         }

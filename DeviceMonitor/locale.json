@@ -16,13 +16,27 @@
             "Update Interval": "Update Intervall",
             "milliseconds": "Millisekunden",
             "seconds": "Sekunden",
-            "Variable profile type does not match for profile": "Der Profiltyp der Variablen stimmt nicht mit dem Profil überein",
             "Broadcast or Mac Address is missing": "Broadcast- oder Mac-Adresse fehlt",
             "Wake On Lan": "Wake on Lan",
             "Ping Timeout": "Ping-Timeout",
             "Hosts": "Geräte",
             "Name": "Name",
-            "Configuration is invalid": "Konfiguration ist ungültig"
+            "Configuration is invalid": "Konfiguration ist ungültig",
+            "Host name": "Hostname",
+            "Device": "Gerät",
+            "Devices": "Geräte",
+            "Check": "Prüfung",
+            "Show host name": "Hostnamen anzeigen",
+            "Show IP address": "IP-Adresse anzeigen",
+            "Wake up": "Aufwecken",
+            "%d of %d online": "%d von %d online",
+            "Tile": "Kachel",
+            "Icon": "Icon",
+            "Image (optional, replaces the icon of a single device, up to 1.5 MB)": "Bild (optional, ersetzt bei einem einzelnen Gerät das Icon, bis 1,5 MB)",
+            "The tile image is too large and is not shown. Please choose a smaller image.": "Das Kachelbild ist zu groß und wird nicht angezeigt. Bitte ein kleineres Bild wählen.",
+            "Overall state of the list": "Gesamtstatus der Liste",
+            "All devices must be online": "Alle Geräte müssen online sein",
+            "At least one device online": "Mindestens ein Gerät online"
         }
     }
 }

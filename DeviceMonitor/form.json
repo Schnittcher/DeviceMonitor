@@ -1,84 +1,167 @@
 {
     "elements": [
         {
-            "type": "CheckBox",
-            "name": "Active",
-            "caption": "Active"
-        },
-        {
-            "type": "CheckBox",
-            "name": "ListOfHosts",
-            "caption": "List of Hosts",
-            "onChange": "DM_listOfHostsActive($id, $ListOfHosts);"
-        },
-        {
-            "type": "ValidationTextBox",
-            "name": "IPAddress",
-            "caption": "IP Address",
-            "visible": true
-        },
-        {
-            "type": "List",
-            "name": "HostsList",
-            "caption": "Hosts",
-            "visible": false,
-            "rowCount": 5,
-            "add": true,
-            "delete": true,
-            "sort": {
-                "column": "name",
-                "direction": "ascending"
-            },
-            "columns": [
+            "type": "RowLayout",
+            "items": [
                 {
-                    "caption": "Name",
-                    "name": "name",
-                    "width": "150px",
-                    "add": "",
-                    "edit": {
-                        "type": "ValidationTextBox"
-                    }
+                    "type": "CheckBox",
+                    "name": "Active",
+                    "caption": "Active"
                 },
                 {
-                    "caption": "IP Address",
-                    "name": "IPAddress",
-                    "width": "auto",
-                    "add": "",
-                    "edit": {
-                        "type": "ValidationTextBox",
-                        "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-                    }
+                    "type": "CheckBox",
+                    "name": "ListOfHosts",
+                    "caption": "List of Hosts",
+                    "onChange": "DM_listOfHostsActive($id, $ListOfHosts);"
                 }
-            ],
-            "values": []
+            ]
         },
         {
-            "type": "Label",
-            "caption": "Ping Timeout"
+            "type": "ExpansionPanel",
+            "name": "DevicePanel",
+            "caption": "Device",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "ValidationTextBox",
+                    "name": "HostName",
+                    "caption": "Host name"
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "IPAddress",
+                    "caption": "IP Address"
+                }
+            ]
         },
         {
-            "type": "IntervalBox",
-            "name": "PingTimeout",
-            "caption": "milliseconds"
+            "type": "ExpansionPanel",
+            "name": "DevicesPanel",
+            "caption": "Devices",
+            "expanded": true,
+            "visible": false,
+            "items": [
+                {
+                    "type": "List",
+                    "name": "HostsList",
+                    "caption": "Hosts",
+                    "rowCount": 5,
+                    "add": true,
+                    "delete": true,
+                    "sort": {
+                        "column": "name",
+                        "direction": "ascending"
+                    },
+                    "columns": [
+                        {
+                            "caption": "Name",
+                            "name": "name",
+                            "width": "150px",
+                            "add": "",
+                            "edit": {
+                                "type": "ValidationTextBox"
+                            }
+                        },
+                        {
+                            "caption": "ID",
+                            "name": "ID",
+                            "width": "0px",
+                            "visible": false,
+                            "save": true,
+                            "add": ""
+                        },
+                        {
+                            "caption": "IP Address",
+                            "name": "IPAddress",
+                            "width": "auto",
+                            "add": "",
+                            "edit": {
+                                "type": "ValidationTextBox",
+                                "validate": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                            }
+                        },
+                        {
+                            "caption": "Icon",
+                            "name": "Icon",
+                            "width": "150px",
+                            "add": "network-wired",
+                            "edit": {
+                                "type": "SelectIcon"
+                            }
+                        },
+                        {
+                            "caption": "MAC Address",
+                            "name": "MACAddress",
+                            "width": "150px",
+                            "add": "",
+                            "edit": {
+                                "type": "ValidationTextBox",
+                                "validate": "^$|^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$"
+                            }
+                        }
+                    ],
+                    "values": []
+                },
+                {
+                    "type": "Select",
+                    "name": "ListStatusMode",
+                    "caption": "Overall state of the list",
+                    "options": [
+                        {
+                            "caption": "All devices must be online",
+                            "value": 0
+                        },
+                        {
+                            "caption": "At least one device online",
+                            "value": 1
+                        }
+                    ]
+                }
+            ]
         },
         {
-            "type": "Label",
-            "caption": "Update Interval"
-        },
-        {
-            "type": "IntervalBox",
-            "name": "Interval",
-            "caption": "seconds"
-        },
-        {
-            "type": "CheckBox",
-            "name": "ActiveTries",
-            "caption": "Active failed attempts"
-        },
-        {
-            "type": "NumberSpinner",
-            "name": "Tries",
-            "caption": "Tries"
+            "type": "ExpansionPanel",
+            "name": "CheckPanel",
+            "caption": "Check",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "NumberSpinner",
+                            "name": "Interval",
+                            "caption": "Update Interval",
+                            "suffix": "seconds",
+                            "minimum": 1
+                        },
+                        {
+                            "type": "NumberSpinner",
+                            "name": "PingTimeout",
+                            "caption": "Ping Timeout",
+                            "suffix": "milliseconds",
+                            "minimum": 1
+                        }
+                    ]
+                },
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "CheckBox",
+                            "name": "ActiveTries",
+                            "caption": "Active failed attempts",
+                            "onChange": "DM_formStateChanged($id, $ActiveTries, $WakeOnLan);"
+                        },
+                        {
+                            "type": "NumberSpinner",
+                            "name": "Tries",
+                            "caption": "Tries",
+                            "minimum": 1
+                        }
+                    ]
+                }
+            ]
         },
         {
             "type": "ExpansionPanel",
@@ -88,7 +171,8 @@
                 {
                     "type": "CheckBox",
                     "name": "WakeOnLan",
-                    "caption": "Wake On Lan"
+                    "caption": "Wake On Lan",
+                    "onChange": "DM_formStateChanged($id, $ActiveTries, $WakeOnLan);"
                 },
                 {
                     "type": "ValidationTextBox",
@@ -99,7 +183,35 @@
                     "type": "ValidationTextBox",
                     "name": "MACAddress",
                     "caption": "MAC Address",
-                    "validate": "^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$"
+                    "validate": "^$|^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$"
+                }
+            ]
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Tile",
+            "name": "Tile",
+            "items": [
+                {
+                    "type": "CheckBox",
+                    "name": "TileShowName",
+                    "caption": "Show host name"
+                },
+                {
+                    "type": "CheckBox",
+                    "name": "TileShowIP",
+                    "caption": "Show IP address"
+                },
+                {
+                    "type": "SelectIcon",
+                    "name": "TileIcon",
+                    "caption": "Icon"
+                },
+                {
+                    "type": "SelectFile",
+                    "name": "TileImageFile",
+                    "caption": "Image (optional, replaces the icon of a single device, up to 1.5 MB)",
+                    "extensions": ".png,.jpg,.jpeg,.gif,.bmp,.svg"
                 }
             ]
         }

@@ -3,3 +3,4 @@
 libs/composer.*
 libs/phpunit.*
 .vscode/*
+docs/adr/

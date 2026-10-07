@@ -1,0 +1,296 @@
+<script src="/icons.js" crossorigin="anonymous"></script>
+<style>
+    :root {
+        --accent: #26d4b9;
+        --online: #19d400;
+        --offline: #f55143;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+    }
+
+    #tile {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .dot {
+        flex: 0 0 auto;
+        width: 0.7em;
+        height: 0.7em;
+        border-radius: 50%;
+        background: var(--offline);
+    }
+
+    .online .dot {
+        background: var(--online);
+    }
+
+    .sub {
+        font-size: 0.8em;
+        opacity: 0.7;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .state {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .btn {
+        padding: 0.2em 0.8em;
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--accent);
+        font: inherit;
+        font-size: 0.85em;
+        cursor: pointer;
+    }
+
+    .btn:active {
+        background: var(--accent);
+        color: #fff;
+    }
+
+    /* Kachel für ein Gerät */
+    .single {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0.6em;
+    }
+
+    .pic {
+        flex: 0 0 28%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-height: 100%;
+        font-size: 2.6em;
+        color: var(--accent);
+    }
+
+    .pic img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+
+    .info {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+        margin-left: 3%;
+        padding-left: 4%;
+        border-left: 1px dotted var(--accent);
+    }
+
+    .info .name {
+        font-weight: 600;
+        font-size: 1.15em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .info .state {
+        font-weight: 600;
+    }
+
+    .info .btn {
+        align-self: flex-start;
+        margin-top: 0.3em;
+    }
+
+    .info .sub {
+        white-space: normal;
+    }
+
+    /* Kachel für die Liste */
+    .list {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .head {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.5em;
+        padding: 0.5em 0.7em;
+        border-bottom: 1px dotted var(--accent);
+    }
+
+    .head .state {
+        flex: 0 1 auto;
+        min-width: 0;
+        font-weight: 600;
+    }
+
+    .rows {
+        flex: 1 1 auto;
+        overflow-y: auto;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+        gap: 0.6em;
+        padding: 0.35em 0.7em;
+    }
+
+    .row .ic {
+        flex: 0 0 1.6em;
+        text-align: center;
+        color: var(--accent);
+    }
+
+    .row .main {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row .btn {
+        flex: 0 0 auto;
+    }
+</style>
+<div id="tile"></div>
+<script>
+    /* Das Modul schickt bei jeder Änderung das komplette Modell, die Kachel wird daraus neu aufgebaut.
+       Alle Werte werden als Text eingesetzt (kein HTML), damit Namen aus der Konfiguration keinen Code einschleusen können. */
+    function el(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) {
+            element.className = className;
+        }
+        if (text !== undefined && text !== null) {
+            element.textContent = text;
+        }
+        return element;
+    }
+
+    function icon(name) {
+        const element = el('i', 'fa-light fa-' + String(name).replace(/[^a-z0-9-]/g, ''));
+        return element;
+    }
+
+    function stateText(model, online) {
+        return online ? model.t.online : model.t.offline;
+    }
+
+    function state(model, online) {
+        const element = el('div', 'state' + (online ? ' online' : ''));
+        element.appendChild(el('span', 'dot'));
+        element.appendChild(el('span', '', stateText(model, online)));
+        return element;
+    }
+
+    /* Nur der Statuspunkt, für enge Stellen. Der Text steht als Tooltip daran. */
+    function stateDot(model, online) {
+        const element = el('div', 'state' + (online ? ' online' : ''));
+        element.title = stateText(model, online);
+        element.appendChild(el('span', 'dot'));
+        return element;
+    }
+
+    function wakeButton(model, ident, label) {
+        const button = el('button', 'btn', label);
+        button.onclick = function () {
+            requestAction(ident, 1);
+        };
+        return button;
+    }
+
+    function renderSingle(model) {
+        const root = el('div', 'single');
+        const pic = el('div', 'pic');
+        if (model.image) {
+            const image = el('img');
+            image.src = model.image;
+            pic.appendChild(image);
+        } else {
+            pic.appendChild(icon(model.icon));
+        }
+        const info = el('div', 'info');
+        if (model.name) {
+            info.appendChild(el('div', 'name', model.name));
+        }
+        if (model.ip) {
+            info.appendChild(el('div', 'sub', model.ip));
+        }
+        info.appendChild(state(model, model.online));
+        info.appendChild(el('div', 'sub', model.t.seen + ': ' + model.seen));
+        info.appendChild(el('div', 'sub', model.t.lastOffline + ': ' + model.lastOffline));
+        if (model.wol) {
+            info.appendChild(wakeButton(model, model.wol, model.t.wake));
+        }
+        root.appendChild(pic);
+        root.appendChild(info);
+        return root;
+    }
+
+    function renderList(model) {
+        const root = el('div', 'list');
+        const head = el('div', 'head');
+        const total = state(model, model.online);
+        total.appendChild(el('span', 'sub', model.summary));
+        head.appendChild(total);
+        root.appendChild(head);
+
+        const rows = el('div', 'rows');
+        model.items.forEach(function (item) {
+            const row = el('div', 'row');
+            const ic = el('div', 'ic');
+            ic.appendChild(icon(item.icon));
+            const main = el('div', 'main');
+            main.appendChild(el('div', '', item.name));
+            if (item.ip) {
+                main.appendChild(el('div', 'sub', item.ip));
+            }
+            main.appendChild(el('div', 'sub', stateText(model, item.online) + ' · ' + model.t.seen + ': ' + item.seen));
+            row.appendChild(ic);
+            row.appendChild(main);
+            if (item.wol) {
+                const button = wakeButton(model, item.wol, '');
+                button.appendChild(icon('power-off'));
+                button.title = model.t.wake;
+                row.appendChild(button);
+            }
+            row.appendChild(stateDot(model, item.online));
+            rows.appendChild(row);
+        });
+        root.appendChild(rows);
+        return root;
+    }
+
+    /* Das Bild ist groß und kommt nur beim Laden und bei Änderungen der Konfiguration, danach bleibt das letzte Bild erhalten */
+    let tileImage = '';
+
+    function handleMessage(data) {
+        const model = JSON.parse(data);
+        if (model.image === undefined) {
+            model.image = tileImage;
+        } else {
+            tileImage = model.image;
+        }
+        const tile = document.getElementById('tile');
+        tile.replaceChildren(model.mode === 'list' ? renderList(model) : renderSingle(model));
+    }
+</script>
