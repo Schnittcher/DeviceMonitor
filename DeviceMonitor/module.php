@@ -310,6 +310,12 @@ class DeviceMonitor extends IPSModuleStrict
         $this->UpdateFormField('MACAddress', 'enabled', $WakeOnLan);
     }
 
+    //Zeitquelle für die Symcon-Stubs der PHPUnit-Tests (sie rufen sie bei Timern auf), im Betrieb ohne Wirkung
+    protected function getTime(): int
+    {
+        return time();
+    }
+
     //Setzt eine Eigenschaft (zum Beispiel "visible" oder "enabled") beim Element mit dem Namen, auch wenn es in einem Panel oder einer Zeile liegt.
     //Das Formular braucht dadurch keine festen Positionen.
     private function SetFormElementProperty(array &$elements, string $name, string $key, bool $value): void
