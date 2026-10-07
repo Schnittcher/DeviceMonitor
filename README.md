@@ -4,54 +4,54 @@
 [![Check Style](https://github.com/Schnittcher/DeviceMonitor/workflows/Check%20Style/badge.svg)](https://github.com/Schnittcher/DeviceMonitor/actions)
 
 # DeviceMonitor
-   Mit diesem Modul ist es möglich den Online / Offline Status von Geräten im LAN zu überwachen.
- 
-## Inhaltverzeichnis
+Mit dieser Bibliothek wird der Online- / Offline-Status von Geräten im LAN überwacht.
+
+## Inhaltsverzeichnis
 - [DeviceMonitor](#devicemonitor)
-  - [Inhaltverzeichnis](#inhaltverzeichnis)
+  - [Inhaltsverzeichnis](#inhaltsverzeichnis)
   - [1. Voraussetzungen](#1-voraussetzungen)
-  - [2. Installation](#2-installation)
-  - [3. Konfiguration in IP-Symcon](#3-konfiguration-in-ip-symcon)
-    - [DeviceMonitor](#devicemonitor-1)
-  - [4. Benutzung](#4-benutzung)
-  - [5. Spenden](#5-spenden)
-  - [6. Lizenz](#6-lizenz)
-   
+  - [2. Funktionsumfang](#2-funktionsumfang)
+  - [3. Enthaltene Module](#3-enthaltene-module)
+  - [4. Installation](#4-installation)
+  - [5. Konfiguration in IP-Symcon](#5-konfiguration-in-ip-symcon)
+  - [6. Spenden](#6-spenden)
+  - [7. Lizenz](#7-lizenz)
+
 ## 1. Voraussetzungen
 
 * mindestens IP-Symcon Version 9.0
+* Die zu überwachenden Geräte müssen per Ping erreichbar sein.
+* Für Wake on Lan muss das Gerät Magic Packets unterstützen und im selben Netzwerk erreichbar sein.
 
-## 2. Installation
-DeviceMonitor
+## 2. Funktionsumfang
+* Überwachung eines einzelnen Geräts oder einer Liste von Geräten per Ping
+* Variablen für Status, zuletzt online und zuletzt offline
+* Fehlversuche, bis ein Gerät als offline gilt
+* Geräte per Wake on Lan wecken
+
+Die einzelnen Funktionen stehen bei den Instanzen unter "Enthaltene Module" und in der README des jeweiligen Moduls.
+
+## 3. Enthaltene Module
+
+* [DeviceMonitor](DeviceMonitor/README.md)
+  * Prüft per Ping, ob ein Gerät oder eine Liste von Geräten online ist.
+  * Legt Variablen für Status, zuletzt online und zuletzt offline an und kann Geräte per Wake on Lan wecken.
+
+## 4. Installation
+Installation über die Modulverwaltung von IP-Symcon mit der Adresse:
 ```
 https://github.com/Schnittcher/DeviceMonitor.git
 ```
 
-## 3. Konfiguration in IP-Symcon
+## 5. Konfiguration in IP-Symcon
+Eine Instanz "DeviceMonitor" anlegen und die Konfiguration nach der [Modul-README](DeviceMonitor/README.md) ausfüllen. Die Instanz prüft danach im eingestellten Intervall, ob die Geräte erreichbar sind.
 
-### DeviceMonitor
+## 6. Spenden
 
-Feld | Beschreibung
------------- | -------------
-Aktiv| Schaltet die Instanz Aktiv bzw. Inaktiv
-Liste von Geräten | Hier kann die Option ausgewählt werden, ob eine Liste von Geräten geprüft werden soll, oder nur ein einzelnes Gerät.
-IP-Adresse  | IP-Adresse des Gerätes, welches überwacht werden soll
-Host | Diese Liste wird nur angezeigt, wenn die Option Liste von Geräten aktiv ist.
-Ping Timeout | Wartezeit in Millisekunden
-Update Intervall |Zeit in Sekunden, wie oft das Gerät überprüft werden soll
-Fehlversuche aktiv | Hier kann hinterlegt werden, ob das Gerät mit Fehlerversuchen geprüft werden soll.
-Versuche |  Hier kann hinterlegt werden, wie oft es versucht werden soll, bis die Variable auf "offline" gesetzt wird.
-WOL | Hier können Einstellung für Wake on Lan gesetzt werden, bei einer Liste von Geräten ist WOL nicht möglich und wird ausgeblendet.
-
-## 4. Benutzung
-Geräte können über die Variable Wake On Lan oder über die Funktion DM_WakeOnLan($InstanceID) geweckt werden.
-
-## 5. Spenden
-
-Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als Unterstützung für den Autor werden hier akzeptiert:    
+Dieses Modul ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als Unterstützung für den Autor werden hier akzeptiert:
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EK4JRP87XLSHW" target="_blank"><img src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif" border="0" /></a> <a href="https://www.amazon.de/hz/wishlist/ls/3JVWED9SZMDPK?ref_=wl_share" target="_blank">Amazon Wunschzettel</a>
 
-## 6. Lizenz
+## 7. Lizenz
 
 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
