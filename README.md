@@ -38,10 +38,7 @@ Die einzelnen Funktionen stehen bei den Instanzen unter "Enthaltene Module" und 
   * Legt Variablen für Status, zuletzt online und zuletzt offline an und kann Geräte per Wake on Lan wecken.
 
 ## 4. Installation
-Installation über die Modulverwaltung von IP-Symcon mit der Adresse:
-```
-https://github.com/Schnittcher/DeviceMonitor.git
-```
+Die Installation erfolgt über den IP-Symcon Module Store.
 
 ## 5. Konfiguration in IP-Symcon
 Eine Instanz "DeviceMonitor" anlegen und die Konfiguration nach der [Modul-README](DeviceMonitor/README.md) ausfüllen. Die Instanz prüft danach im eingestellten Intervall, ob die Geräte erreichbar sind.
