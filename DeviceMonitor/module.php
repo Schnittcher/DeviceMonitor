@@ -1,15 +1,15 @@
 <?php
 
 declare(strict_types=1);
-require_once __DIR__ . '/../libs/helper.php';
+require_once __DIR__ . '/../libs/WOLHelper.php';
 require_once __DIR__ . '/../libs/vendor/SymconModulHelper/VariableProfileHelper.php';
 
-class DeviceMonitor extends IPSModule
+class DeviceMonitor extends IPSModuleStrict
 {
-    use Helper;
+    use WOLHelper;
     use VariableProfileHelper;
 
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -17,7 +17,7 @@ class DeviceMonitor extends IPSModule
         $this->RegisterPropertyBoolean('Active', false);
         $this->RegisterPropertyBoolean('ListOfHosts', false);
         $this->RegisterPropertyString('IPAddress', '');
-        $this->RegisterPropertyString('HostsList', '{}');
+        $this->RegisterPropertyString('HostsList', '[]');
         $this->RegisterPropertyString('BroadcastAddress', '');
         $this->RegisterPropertyString('MACAddress', '');
         $this->RegisterPropertyBoolean('ActiveTries', false);
@@ -35,12 +35,13 @@ class DeviceMonitor extends IPSModule
 
     }
 
-    public function Destroy()
+    public function Destroy(): void
     {
-        $this->UnregisterTimer('DM_UpdateStatus');
+        //Never delete this line!
+        parent::Destroy();
     }
 
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Never delete this line!
         parent::ApplyChanges();
@@ -53,24 +54,27 @@ class DeviceMonitor extends IPSModule
         $this->RegisterMessage($this->InstanceID, IM_CHANGESTATUS);
 
         $hostsList = json_decode($this->ReadPropertyString('HostsList'), true);
+        $hostsListValid = is_array($hostsList);
+        if (!$hostsListValid) {
+            $hostsList = [];
+        }
         $ListOfHosts = $this->ReadPropertyBoolean('ListOfHosts');
-        $childrenIDs = IPS_GetChildrenIDs($this->InstanceID);
-        foreach ($childrenIDs as $key => $childID) {
-            if (IPS_ObjectExists($childID)) {
-                $childObject = IPS_GetObject($childID);
-                if ($childObject['ObjectType'] == 2) { //Wenn Objekt eine Variable ist
-                if (strpos($childObject['ObjectIdent'], 'lst_') !== false) { //Wenn Ident aus der Liste der Variablen stammt
-                    if ((strpos($childObject['ObjectIdent'], '_LastSeen') == false) OR (strpos($childObject['ObjectIdent'], '_LastOffline') == false))  { //Wenn es nicht die LastSeen Variable ist
-                        $varibaleIdent = explode('lst_', $childObject['ObjectIdent']);
-                        $IPAddress = str_replace('_', '.', $varibaleIdent[1]);
-                        if (array_search($IPAddress, array_column($hostsList, 'IPAddress')) === false) {
-                            $this->UnregisterVariable($childObject['ObjectIdent']);
-                            $this->UnregisterVariable($childObject['ObjectIdent'] . '_LastSeen');
-                            $this->UnregisterVariable($childObject['ObjectIdent'] . '_LastOffline');
-                        }
-                    }
-                }
-                }
+
+        //Idents aller Variablen, die zur aktuellen Liste gehören
+        $validIdents = [];
+        foreach ($hostsList as $host) {
+            $identBase = 'lst_' . str_replace('.', '_', $host['IPAddress'] ?? '');
+            $validIdents[] = $identBase;
+            $validIdents[] = $identBase . '_LastSeen';
+            $validIdents[] = $identBase . '_LastOffline';
+        }
+        //Variablen von Geräten entfernen, die nicht mehr in der Liste stehen
+        foreach (IPS_GetChildrenIDs($this->InstanceID) as $childID) {
+            $childObject = IPS_GetObject($childID);
+            if ($childObject['ObjectType'] == OBJECTTYPE_VARIABLE
+                && strpos($childObject['ObjectIdent'], 'lst_') === 0
+                && !in_array($childObject['ObjectIdent'], $validIdents, true)) {
+                $this->UnregisterVariable($childObject['ObjectIdent']);
             }
         }
 
@@ -85,12 +89,12 @@ class DeviceMonitor extends IPSModule
             if ($ListOfHosts) {
                 //Buffer resetten, damit die Zählung neu beginnen kann.
                 $this->SetBuffer($IdentState, '');
-                $this->SetBuffer('Tries' . $IdentState, 0);
+                $this->SetBuffer('Tries' . $IdentState, '0');
             }
             $variablePosition++;
-            $this->MaintainVariable($IdentLastSeen, $this->Translate('Last seen') . ' ' . $host['name'], 1, 'UnixTimestamp', $variablePosition, $ListOfHosts);
+            $this->MaintainVariable($IdentLastSeen, $this->Translate('Last seen') . ' ' . $host['name'], 1, '~UnixTimestamp', $variablePosition, $ListOfHosts);
             $variablePosition++;
-            $this->MaintainVariable($IdentLastOffline, $this->Translate('Last offline') . ' ' . $host['name'], 1, 'UnixTimestamp', $variablePosition, $ListOfHosts);
+            $this->MaintainVariable($IdentLastOffline, $this->Translate('Last offline') . ' ' . $host['name'], 1, '~UnixTimestamp', $variablePosition, $ListOfHosts);
         }
 
         $WOL = $this->ReadPropertyBoolean('WakeOnLan');
@@ -100,17 +104,36 @@ class DeviceMonitor extends IPSModule
             $this->EnableAction('DeviceWOL');
         }
 
-        if ($this->ReadPropertyBoolean('Active')) {
-            $this->SetTimerInterval('DM_UpdateTimer', $this->ReadPropertyInteger('Interval') * 1000);
-            $this->UpdateStatus();
-            $this->SetStatus(102);
-        } else {
+        if (!$this->ReadPropertyBoolean('Active')) {
             $this->SetTimerInterval('DM_UpdateTimer', 0);
             $this->SetStatus(104);
+            return;
         }
+
+        //Konfiguration prüfen, bevor gepingt wird
+        $configValid = $this->ReadPropertyInteger('Interval') > 0 && $this->ReadPropertyInteger('PingTimeout') > 0;
+        if ($ListOfHosts) {
+            $configValid = $configValid && $hostsListValid && count($hostsList) > 0;
+            foreach ($hostsList as $host) {
+                if (trim($host['IPAddress'] ?? '') === '') {
+                    $configValid = false;
+                }
+            }
+        } else {
+            $configValid = $configValid && trim($this->ReadPropertyString('IPAddress')) !== '';
+        }
+        if (!$configValid) {
+            $this->SetTimerInterval('DM_UpdateTimer', 0);
+            $this->SetStatus(201);
+            return;
+        }
+
+        $this->SetTimerInterval('DM_UpdateTimer', $this->ReadPropertyInteger('Interval') * 1000);
+        $this->UpdateStatus();
+        $this->SetStatus(102);
     }
 
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         if ($this->ReadPropertyBoolean('ListOfHosts')) {
@@ -124,7 +147,7 @@ class DeviceMonitor extends IPSModule
         return json_encode($form);
     }
 
-    public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
+    public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
 
         //Wenn der Status sich der Instanz ändert
@@ -140,7 +163,7 @@ class DeviceMonitor extends IPSModule
         }
     }
 
-    public function UpdateStatus()
+    public function UpdateStatus(): void
     {
         $ListOfHosts = $this->ReadPropertyBoolean('ListOfHosts');
         $deviceState = false;
@@ -148,12 +171,14 @@ class DeviceMonitor extends IPSModule
         //Liste der Hosts durch gehen und pingen
         if ($ListOfHosts) {
             $hostsList = json_decode($this->ReadPropertyString('HostsList'), true);
+            if (!is_array($hostsList)) {
+                return;
+            }
             $totalState = true;
             foreach ($hostsList as $key => $host) {
                 $IdentState = 'lst_' . str_replace('.', '_', $host['IPAddress']);
                 $IdentLastSeen = 'lst_' . str_replace('.', '_', $host['IPAddress']) . '_LastSeen';
                 $IdentLastOffline = 'lst_' . str_replace('.', '_', $host['IPAddress']) . '_LastOffline';
-
 
                 $deviceState = $this->pingHost($host['IPAddress'], $IdentState);
                 $this->SetValue($IdentState, $deviceState);
@@ -186,7 +211,7 @@ class DeviceMonitor extends IPSModule
         }
     }
 
-    public function RequestAction($Ident, $Value)
+    public function RequestAction(string $Ident, mixed $Value): void
     {
         $this->SendDebug(__FUNCTION__ . ' Ident', $Ident, 0);
         $this->SendDebug(__FUNCTION__ . ' Value', $Value, 0);
@@ -201,7 +226,7 @@ class DeviceMonitor extends IPSModule
         }
     }
 
-    public function listOfHostsActive($Value)
+    public function listOfHostsActive(bool $Value): void
     {
         if ($Value) {
             $this->UpdateFormField('HostsList', 'visible', true);
@@ -214,38 +239,34 @@ class DeviceMonitor extends IPSModule
         }
     }
 
-    private function pingHost($IPAddress, $Ident)
+    private function pingHost(string $IPAddress, string $Ident): bool
     {
-        if ((($IPAddress != '') && $this->ReadPropertyInteger('PingTimeout') != '')) {
-            if (@Sys_Ping($IPAddress, $this->ReadPropertyInteger('PingTimeout'))) {
-                $this->SetBuffer('Tries' . $Ident, '0');
-                $this->SetBuffer('Tries', '0');
-                $this->SetBuffer($Ident, 'true');
-                return true;
-            } else {
-                if ((intval($this->GetBuffer('Tries' . $Ident)) < $this->ReadPropertyInteger('Tries')) && ($this->ReadPropertyBoolean('ActiveTries'))) {
-                    $tries = intval($this->GetBuffer('Tries' . $Ident));
-                    $tries++;
-                    $this->SendDebug('UpdateStatus :: Tries for IP-Address', $IPAddress, 0);
-                    $this->SendDebug('UpdateStatus :: Tries' . $Ident, $tries, 0);
-                    $this->SetBuffer('Tries' . $Ident, strval($tries));
-                }
-                if (intval($this->GetBuffer('Tries' . $Ident)) >= $this->ReadPropertyInteger('Tries')) {
-                    $this->SetBuffer('Tries' . $Ident, '0');
-                    $this->SetBuffer($Ident, 'false');
-                    return false;
-                } else {
-                    if (($this->GetBuffer($Ident) == 'true') && ($this->ReadPropertyBoolean('ActiveTries'))) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
+        if ($IPAddress == '' || $this->ReadPropertyInteger('PingTimeout') <= 0) {
+            return false;
         }
+
+        if (@Sys_Ping($IPAddress, $this->ReadPropertyInteger('PingTimeout'))) {
+            $this->SetBuffer('Tries' . $Ident, '0');
+            $this->SetBuffer($Ident, 'true');
+            return true;
+        }
+
+        if ((intval($this->GetBuffer('Tries' . $Ident)) < $this->ReadPropertyInteger('Tries')) && ($this->ReadPropertyBoolean('ActiveTries'))) {
+            $tries = intval($this->GetBuffer('Tries' . $Ident));
+            $tries++;
+            $this->SendDebug('UpdateStatus :: Tries for IP-Address', $IPAddress, 0);
+            $this->SendDebug('UpdateStatus :: Tries' . $Ident, $tries, 0);
+            $this->SetBuffer('Tries' . $Ident, strval($tries));
+        }
+        if (intval($this->GetBuffer('Tries' . $Ident)) >= $this->ReadPropertyInteger('Tries')) {
+            $this->SetBuffer('Tries' . $Ident, '0');
+            $this->SetBuffer($Ident, 'false');
+            return false;
+        }
+        return ($this->GetBuffer($Ident) == 'true') && $this->ReadPropertyBoolean('ActiveTries');
     }
 
-    private function RegisterVariablenProfiles()
+    private function RegisterVariablenProfiles(): void
     {
         //Profile for Online / Offline Status
         if (!IPS_VariableProfileExists('DM.Status')) {

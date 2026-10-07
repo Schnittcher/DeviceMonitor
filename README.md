@@ -1,35 +1,35 @@
 [![Version](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-![Version](https://img.shields.io/badge/Symcon%20Version-5.0%20%3E-blue.svg)
+![Version](https://img.shields.io/badge/Symcon%20Version-9.0%20%3E-blue.svg)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Check Style](https://github.com/Schnittcher/IPS-DeviceMonitor/workflows/Check%20Style/badge.svg)](https://github.com/Schnittcher/IPS-DeviceMonitor/actions)
+[![Check Style](https://github.com/Schnittcher/DeviceMonitor/workflows/Check%20Style/badge.svg)](https://github.com/Schnittcher/DeviceMonitor/actions)
 
-# IPS-DeviceMonitor
+# DeviceMonitor
    Mit diesem Modul ist es möglich den Online / Offline Status von Geräten im LAN zu überwachen.
  
 ## Inhaltverzeichnis
-- [IPS-DeviceMonitor](#ips-devicemonitor)
+- [DeviceMonitor](#devicemonitor)
   - [Inhaltverzeichnis](#inhaltverzeichnis)
   - [1. Voraussetzungen](#1-voraussetzungen)
   - [2. Installation](#2-installation)
   - [3. Konfiguration in IP-Symcon](#3-konfiguration-in-ip-symcon)
-    - [IPS-DeviceMonitor](#ips-devicemonitor-1)
+    - [DeviceMonitor](#devicemonitor-1)
   - [4. Benutzung](#4-benutzung)
   - [5. Spenden](#5-spenden)
   - [6. Lizenz](#6-lizenz)
    
 ## 1. Voraussetzungen
 
-* mindestens IPS Version 5.0
+* mindestens IP-Symcon Version 9.0
 
 ## 2. Installation
-IPS-DeviceMonitor
+DeviceMonitor
 ```
-https://github.com/Schnittcher/IPS-DeviceMonitor.git
+https://github.com/Schnittcher/DeviceMonitor.git
 ```
 
 ## 3. Konfiguration in IP-Symcon
 
-### IPS-DeviceMonitor
+### DeviceMonitor
 
 Feld | Beschreibung
 ------------ | -------------

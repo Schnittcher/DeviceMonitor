@@ -18,7 +18,11 @@
             "seconds": "Sekunden",
             "Variable profile type does not match for profile": "Der Profiltyp der Variablen stimmt nicht mit dem Profil überein",
             "Broadcast or Mac Address is missing": "Broadcast- oder Mac-Adresse fehlt",
-            "Wake on Lan": "Wake on Lan"
+            "Wake On Lan": "Wake on Lan",
+            "Ping Timeout": "Ping-Timeout",
+            "Hosts": "Geräte",
+            "Name": "Name",
+            "Configuration is invalid": "Konfiguration ist ungültig"
         }
     }
 }

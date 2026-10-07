@@ -9,5 +9,6 @@
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
-    "prefix": "DM"
+    "prefix": "DM",
+    "url": "https://github.com/Schnittcher/DeviceMonitor"
 }
