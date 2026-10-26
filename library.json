@@ -3,6 +3,9 @@
     "author": "Kai Schnittcher",
     "name": "DeviceMonitor",
     "url": "https://github.com/Schnittcher/DeviceMonitor",
+    "compatibility": {
+        "version": "9.0"
+    },
     "version": "2.0",
     "build": 0,
     "date": 0

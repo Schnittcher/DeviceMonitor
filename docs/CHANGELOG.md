@@ -12,6 +12,8 @@
 - Wake on Lan funktioniert jetzt auch bei einer Liste von Geräten. Jedes Gerät in der Liste hat ein Feld für die MAC-Adresse und bekommt, wenn Wake on Lan aktiv und die MAC-Adresse gültig ist, eine eigene Variable zum Wecken. Die Broadcast-Adresse gilt für alle Geräte der Liste.
 
 ### Fixes
+- Die Bibliothek gibt jetzt IP-Symcon 9.0 als Mindestversion (`compatibility`) an.
+- Der Spendenhinweis im Konfigurationsformular ist jetzt lokalisiert (englisches Original, deutsche Übersetzung in der `locale.json`).
 - Zuletzt-online- und Zuletzt-offline-Variablen der Geräteliste bleiben bei jeder Änderung der Konfiguration erhalten und werden nicht mehr gelöscht und neu angelegt.
 - Zuletzt-online- und Zuletzt-offline-Variablen der Geräteliste werden wieder als Datum und Uhrzeit angezeigt. Achtung: Bei bestehenden Instanzen wird das Profil beim nächsten Speichern der Konfiguration korrigiert.
 - Die Instanz meldet bei fehlender IP-Adresse, leerer Geräteliste oder ungültigem Intervall bzw. Timeout den Status "Konfiguration ist ungültig", statt Fehler zu erzeugen.
