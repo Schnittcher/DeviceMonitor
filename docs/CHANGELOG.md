@@ -12,11 +12,53 @@
 - Wake on Lan funktioniert jetzt auch bei einer Liste von Geräten. Jedes Gerät in der Liste hat ein Feld für die MAC-Adresse und bekommt, wenn Wake on Lan aktiv und die MAC-Adresse gültig ist, eine eigene Variable zum Wecken. Die Broadcast-Adresse gilt für alle Geräte der Liste.
 
 ### Fixes
-- Die Bibliothek gibt jetzt IP-Symcon 9.0 als Mindestversion (`compatibility`) an.
-- Der Spendenhinweis im Konfigurationsformular ist jetzt lokalisiert (englisches Original, deutsche Übersetzung in der `locale.json`).
 - Zuletzt-online- und Zuletzt-offline-Variablen der Geräteliste bleiben bei jeder Änderung der Konfiguration erhalten und werden nicht mehr gelöscht und neu angelegt.
 - Zuletzt-online- und Zuletzt-offline-Variablen der Geräteliste werden wieder als Datum und Uhrzeit angezeigt. Achtung: Bei bestehenden Instanzen wird das Profil beim nächsten Speichern der Konfiguration korrigiert.
 - Die Instanz meldet bei fehlender IP-Adresse, leerer Geräteliste oder ungültigem Intervall bzw. Timeout den Status "Konfiguration ist ungültig", statt Fehler zu erzeugen.
 - Die Beschriftungen "Ping Timeout" und "Update Intervall" werden im Formular wieder angezeigt.
 - Wake on Lan prüft die MAC-Adresse und meldet Fehler beim Senden, statt abzubrechen.
 - Der Ordner des Moduls heißt jetzt DeviceMonitor statt IPS-DeviceMonitor, die Repository-Adresse wurde angepasst.
+
+## 12.06.2023 - Version 1.4
+
+### Neu
+- Es können mehrere Geräte hinterlegt werden.
+
+### Fixes
+- WOL unter Windows funktionierte nicht richtig
+
+## 26.10.2022 - Version 1.3.2
+
+### Neu
+- Es können Fehlversuche hinterlegt werden
+- Wenn die Instanz inaktiv ist, wird die Status Variable auf offline gesetzt und beim Aktivieren der Instanz wird der Status nun auch direkt überprüft
+
+## 15.08.2022 - Version 1.3.1
+
+### Neu
+- Instanz kann aktiv und inaktiv geschaltet werden
+
+## 27.10.2020 - Version 1.3
+
+### Neu
+- WOL wird nicht angezeigt, wenn es nicht aktiviert ist.
+
+## 08.04.2019 - Version 1.2
+
+### Neu
+- Funktion DM_WakeOnLan hinzugefügt
+
+### Fixes
+- Abfangen von Fehlern, wenn Mac und Broadcast Adresse nicht gesetzt sind
+
+## 18.02.2019 - Version 1.1.1
+
+### Fixes
+- Timer wird beim Destroy gelöscht
+
+## 18.02.2019 - Version 1.1
+
+### Neu
+- WOL hinzugefügt
+
+## 18.02.2019 - Version 1.0
