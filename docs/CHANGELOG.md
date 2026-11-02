@@ -18,6 +18,7 @@
 - Die Beschriftungen "Ping Timeout" und "Update Intervall" werden im Formular wieder angezeigt.
 - Wake on Lan prüft die MAC-Adresse und meldet Fehler beim Senden, statt abzubrechen.
 - Der Ordner des Moduls heißt jetzt DeviceMonitor statt IPS-DeviceMonitor, die Repository-Adresse wurde angepasst.
+- Der Dokumentationslink der Instanzen führt jetzt zur Dokumentation auf deinsmarthome.info.
 
 ## 12.06.2023 - Version 1.4
 
