@@ -77,6 +77,9 @@ class DeviceMonitor extends IPSModuleStrict
         $this->SetBuffer('TriesDeviceStatus', '0');
 
         $this->RegisterMessage($this->InstanceID, IM_CHANGESTATUS);
+        if (IPS_GetKernelRunlevel() !== KR_READY) {
+            $this->RegisterMessage(0, IPS_KERNELMESSAGE);
+        }
 
         $hostsList = json_decode($this->ReadPropertyString('HostsList'), true);
         $hostsListValid = is_array($hostsList);
@@ -176,8 +179,11 @@ class DeviceMonitor extends IPSModuleStrict
         }
 
         $this->SetTimerInterval('DM_UpdateTimer', $this->ReadPropertyInteger('Interval') * 1000);
-        $this->UpdateStatus();
         $this->SetStatus(102);
+        //Beim Start von Symcon nicht synchron pingen, die Timeouts würden den Start verzögern. Die erste Prüfung kommt mit KR_READY.
+        if (IPS_GetKernelRunlevel() === KR_READY) {
+            $this->UpdateStatus();
+        }
         //Nach einer Änderung der Konfiguration auch das Bild neu senden
         $this->UpdateTile(true);
     }
@@ -202,6 +208,14 @@ class DeviceMonitor extends IPSModuleStrict
 
     public function MessageSink(int $TimeStamp, int $SenderID, int $Message, array $Data): void
     {
+        //Kernel ist gestartet: erste Prüfung nachholen, die ApplyChanges() beim Start übersprungen hat
+        if ($Message == IPS_KERNELMESSAGE && $Data[0] == KR_READY) {
+            $this->UnregisterMessage(0, IPS_KERNELMESSAGE);
+            if ($this->GetStatus() == 102) {
+                $this->UpdateStatus();
+            }
+            return;
+        }
 
         //Wenn der Status sich der Instanz ändert
         if ($Message == IM_CHANGESTATUS) {
@@ -226,6 +240,10 @@ class DeviceMonitor extends IPSModuleStrict
 
     public function UpdateStatus(): void
     {
+        if (IPS_GetKernelRunlevel() !== KR_READY) {
+            return;
+        }
+
         $ListOfHosts = $this->ReadPropertyBoolean('ListOfHosts');
         $deviceState = false;
 

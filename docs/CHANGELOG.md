@@ -1,5 +1,10 @@
 # Changelog
 
+## 13.11.2026 - Version 2.1
+
+### Fixes
+- Beim Start von Symcon pingt das Modul die Geräte nicht mehr synchron in `ApplyChanges()`. Die erste Prüfung läuft erst, wenn der Kernel bereit ist, dadurch verzögern unerreichbare Geräte mit ihren Ping-Timeouts den Start nicht mehr.
+
 ## 07.10.2026 - Version 2.0
 
 ### Neu
